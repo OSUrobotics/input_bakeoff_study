@@ -1,0 +1,6 @@
+<launch>
+	<include file="$(find face_detector)/launch/face_detector.rgbd.launch">
+		<arg name="image_topic" value="image_raw"/>
+		<arg name="depth_topic" value="image_raw"/>
+	</include>
+</launch>
