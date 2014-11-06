@@ -19,15 +19,24 @@ class Conditions:
                       For this trial, you will use a regular mouse to pop the bubbles''')
     HEAD  = Condition('HEAD',
                       [packages.head_pose_estimation.launches.estimator_launch,
-                       packages.openni_launch.launches.openni_launch_launch],
-                       'head'
-            )
+                       packages.openni_launch.launches.openni_launch_launch,
+                       packages.input_bakeoff_study.nodes.face_frame_py],
+                       'You are playing a bubble popping game.<br/>\
+                       The object is to pop as many bubbles as you can in the allotted time.<br/>\
+                       For this trial, you will control the mouse with the orientation of your head.<br/>\
+                       Do do so, rotate your head left, right, up, and down to make the cursor move in those directions.<br/>\
+                       Press A on the Wiimote to click''')
     GLASS = Condition('GLASS',
-                      [],
-                      'glass')
-    EYE   = Condition('EYE',
-                      [],
-                      'eye')
+                      [packages.input_bakeoff_study.launches.face_detector_remapped_launch,
+                       packages.input_bakeoff_study.nodes.face_frame_py],
+                       'You are playing a bubble popping game.<br/>\
+                       The object is to pop as many bubbles as you can in the allotted time.<br/>\
+                       For this trial, you will control the mouse with the orientation of your head while wearing Google Glass.<br/>\
+                       Do do so, rotate your head left, right, up, and down to make the cursor move in those directions.<br/>\
+                       Press A on the Wiimote to click''')
+    # EYE   = Condition('EYE',
+    #                   [],
+    #                   'eye')
 
     class __metaclass__(type):
         def __iter__(self):
@@ -36,7 +45,7 @@ class Conditions:
                     yield getattr(Conditions, attr)
 
 def show_instructions(text):
-    text += '<br/><br/>Press Spacebar to continue.'
+    text += '<br/><br/>If you have any questions, please ask the experimenter now.</br>Press Spacebar when ready to continue.'
     print text
     return packages.input_bakeoff_study.nodes.splashscreen_py('"%s"' % text)
 
@@ -51,7 +60,7 @@ for cond in conditions:
 
     # put up a splashscreen to give the participant condition-specific instructions
     splash = show_instructions(cond.instructions)
-    sleep(1)
+    sleep(1) # give the node some time to register
     while splash():
         sleep(0.5)
 
