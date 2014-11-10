@@ -6,26 +6,32 @@ import os
 
 DATA_DIR = os.path.join(packages.input_bakeoff_study.path, 'data')
 
+CALIBRATION_TEXT = '<br/><br/>Before continuing,<br/>the mouse input needs to be calibrated.<br/>To continue with calibration, press the spacebar.'
+CONTINUE_TEXT = '<br/><br/>If you have any questions, please ask the experimenter now.</br>Press Spacebar when ready to continue.'
+
 def make_participant_id():
     return now().nsecs
 
-Condition = namedtuple('Condition', ['name', 'launches', 'instructions'])
+Condition = namedtuple('Condition', ['name', 'launches', 'instructions', 'requires_calibration'])
 
 class Conditions:
     MOUSE = Condition('MOUSE',
                       [],
                       'You are playing a bubble popping game.<br/>\
                       The object is to pop as many bubbles as you can in the allotted time.<br/>\
-                      For this trial, you will use a regular mouse to pop the bubbles''')
+                      For this trial, you will use a regular mouse to pop the bubbles.''',
+                      False)
     HEAD  = Condition('HEAD',
                       [packages.head_pose_estimation.launches.estimator_launch,
-                       packages.openni_launch.launches.openni_launch_launch,
+                       packages.openni_launch.launches.openni_launch,
                        packages.input_bakeoff_study.nodes.face_frame_py],
                        'You are playing a bubble popping game.<br/>\
                        The object is to pop as many bubbles as you can in the allotted time.<br/>\
                        For this trial, you will control the mouse with the orientation of your head.<br/>\
-                       Do do so, rotate your head left, right, up, and down to make the cursor move in those directions.<br/>\
-                       Press A on the Wiimote to click''')
+                       Do do so, rotate your head left, right, up, and down<br/>to make the cursor move in those directions.<br/>\
+                       Press A on the Wiimote to click on a bubble.''' \
+                       + CALIBRATION_TEXT,
+                       True)
     GLASS = Condition('GLASS',
                       [packages.input_bakeoff_study.launches.face_detector_remapped_launch,
                        packages.input_bakeoff_study.nodes.face_frame_py],
@@ -33,7 +39,9 @@ class Conditions:
                        The object is to pop as many bubbles as you can in the allotted time.<br/>\
                        For this trial, you will control the mouse with the orientation of your head while wearing Google Glass.<br/>\
                        Do do so, rotate your head left, right, up, and down to make the cursor move in those directions.<br/>\
-                       Press A on the Wiimote to click''')
+                       Press A on the Wiimote to click on a bubble.''' \
+                       + CALIBRATION_TEXT,
+                       True)
     # EYE   = Condition('EYE',
     #                   [],
     #                   'eye')
@@ -44,25 +52,35 @@ class Conditions:
                 if not attr.startswith('_'):
                     yield getattr(Conditions, attr)
 
-def show_instructions(text):
-    text += '<br/><br/>If you have any questions, please ask the experimenter now.</br>Press Spacebar when ready to continue.'
-    print text
-    return packages.input_bakeoff_study.nodes.splashscreen_py('"%s"' % text)
+def show_instructions(text, blocking=False):
+    # text += 
+    # print text
+    splash = packages.input_bakeoff_study.nodes.splashscreen_py('"%s"' % text)
+    if blocking:
+        sleep(1)
+        while splash():
+            sleep(0.5)
+    else: return splash
 
 
 particip_id = make_participant_id()
 
 conditions = list(Conditions)
 shuffle(conditions)
+click_pub = rospy.Publisher('/click', msg.std_msgs.Empty)
 for cond in conditions:
     # start up the condition's prerequisites
     launched = [launch(l) for l in cond.launches]
 
     # put up a splashscreen to give the participant condition-specific instructions
-    splash = show_instructions(cond.instructions)
-    sleep(1) # give the node some time to register
-    while splash():
-        sleep(0.5)
+    splash = show_instructions(cond.instructions, blocking=True)
+
+    if cond.requires_calibration:
+        launch(packages.input_bakeoff_study.nodes.mouse_node_py)
+        show_instructions('Rotate your head so your nose is<br/>pointing at the top left corner of the screen,<br/>then press the spacebar', blocking=True)
+        click_pub.publish()
+        show_instructions('Rotate your head so your nose is<br/>pointing at the bottom right corner of the screen,<br/>then press the spacebar', blocking=True)
+        show_instructions('Calibration is complete. Press spacebar to continue.', blocking=True)
 
     # start the game
     output_file_name = os.path.join(DATA_DIR, 'subj_%s_%s' % (particip_id, cond.name))
