@@ -29,7 +29,6 @@ def pose_cb(pose):
     if initialized:
         px = int(angle_to_pixel(yaw, left, right, 0, mouse.screen_size()[0]))
         py = int(angle_to_pixel(pitch, top, bottom, 0, mouse.screen_size()[1]))
-        print px, py
         mouse.move(px, py)
 
 
@@ -53,7 +52,6 @@ if __name__ == '__main__':
     rospy.wait_for_message('click', Empty)
     right, bottom = yaw, pitch
     print 'Done.'
-    print left, right
     initialized = True
 
     rospy.Subscriber('click', Empty, click_cb)
