@@ -1,0 +1,3 @@
+#!/usr/bin/env sh
+addr=$(ifconfig eth1 | grep "inet addr" | cut -d: -f2 | cut -d" " -f 1)
+adb shell am start -a android.intent.action.MAIN -n edu.oregonstate.robotics/.MainActivity -e ROS_ADDR $addr:9999

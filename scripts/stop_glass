@@ -1,0 +1,2 @@
+#!/usr/bin/env sh
+adb shell am force-stop edu.oregonstate.robotics
