@@ -36,9 +36,7 @@ class Conditions:
                        True)
     GLASS = Condition('GLASS',
                       [
-                      # packages.input_bakeoff_study.launches.face_detector_remapped_launch,
-                       packages.openni_launch.launches.openni_launch,
-                       packages.input_bakeoff_study.nodes.face_frame_py,
+                       packages.input_bakeoff_study.launches.glass_frames_launch,
                        packages.input_bakeoff_study.nodes.glassSensorBridge_py,
                        packages.input_bakeoff_study.nodes.start_glass],
                       [packages.input_bakeoff_study.nodes.stop_glass],
@@ -61,8 +59,6 @@ class Conditions:
                     yield getattr(Conditions, attr)
 
 def show_instructions(text, blocking=False):
-    # text += 
-    # print text
     splash = packages.input_bakeoff_study.nodes.splashscreen_py('"%s"' % text)
     if blocking:
         sleep(1)
@@ -96,7 +92,7 @@ for cond in conditions:
     game = packages.input_bakeoff_study.nodes.game_sh('%s' % output_file_name)
 
     # wait until the condition is finished
-    sleep(500)
+    sleep(300)
 
     # end the game (don't worry if this generates a KeyboardInterrupt backgrace)
     kill(game)

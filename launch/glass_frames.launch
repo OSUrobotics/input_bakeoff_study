@@ -1,0 +1,3 @@
+<launch>
+	<node name="face_detection_frame" pkg="tf" type="static_transform_publisher" args="0 0 0 0 0 0 world face_detection 100"/>
+</launch>
