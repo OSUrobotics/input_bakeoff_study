@@ -15,10 +15,14 @@ def keyPressEvent(e):
    if (e.key() == 16777216) or (e.key() == 32):
       QtGui.QApplication.quit()
 
+def mousePressEvent(e):
+    QtGui.QApplication.quit()
+
 app = QtGui.QApplication(argv)
 wid = QtGui.QLabel(sys.argv[1])
 wid.setFont(QtGui.QFont('Arial', 42))
 wid.setAlignment(QtCore.Qt.AlignCenter)
 wid.keyPressEvent = keyPressEvent
+wid.mousePressEvent = mousePressEvent
 wid.showFullScreen()
 sys.exit(app.exec_())

@@ -6,7 +6,7 @@ import os
 
 DATA_DIR = os.path.join(packages.input_bakeoff_study.path, 'data')
 
-CALIBRATION_TEXT = '<br/><br/>Before continuing,<br/>the mouse input needs to be calibrated.<br/>To continue with calibration, press the spacebar.'
+CALIBRATION_TEXT = '<br/><br/>Before continuing,<br/>the mouse input needs to be calibrated.<br/>To continue with calibration, click the mouse.'
 CONTINUE_TEXT = '<br/><br/>If you have any questions, please ask the experimenter now.</br>Press Spacebar when ready to continue.'
 
 def make_participant_id():
@@ -81,9 +81,9 @@ for cond in conditions:
 
     if cond.requires_calibration:
         launch(packages.input_bakeoff_study.nodes.mouse_node_py)
-        show_instructions('Rotate your head so your nose is<br/>pointing at the top left corner of the screen,<br/>then press the spacebar', blocking=True)
+        show_instructions('Rotate your head so your nose is<br/>pointing at the top left corner of the screen,<br/>then click the mouse', blocking=True)
         click_pub.publish()
-        show_instructions('Rotate your head so your nose is<br/>pointing at the bottom right corner of the screen,<br/>then press the spacebar', blocking=True)
+        show_instructions('Rotate your head so your nose is<br/>pointing at the bottom right corner of the screen,<br/>then click the mouse', blocking=True)
         click_pub.publish()
         show_instructions('Calibration is complete. Press spacebar to continue.', blocking=True)
 
