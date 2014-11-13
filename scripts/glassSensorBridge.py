@@ -25,7 +25,7 @@ class SocketHandler(SocketServer.BaseRequestHandler):
         print "Handle"
         self.br = tf.TransformBroadcaster()
         self.imu_pub = rospy.Publisher('/android/imu', Imu)
-        self.pose_pub = rospy.Publisher('/head_pose', PoseStamped)
+        self.pose_pub = rospy.Publisher('/head_pose', PoseStamped, queue_size=1)
         self.light_pub = rospy.Publisher('/android/light', Illuminance)
         self.click_pub = rospy.Publisher('/click', Empty)
         self.glass_base_frame = '/face_detection'
